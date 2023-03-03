@@ -1,0 +1,52 @@
+# DataSource Config
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/demodeller_sql?useUnicode=true&useSSL=false&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: mysql123
+  neo4j:
+    url: bolt://localhost:7687
+    username: neo4j
+    password: neo4j123
+
+  #配置文件上传大小,这里必须配置,因为默认为1MB,超过上传大小会抛一个异常,可以进行全局异常处理
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**Mapper.xml
+
+server:
+  port: 8081
+
+
+#配置分页插件pagehelper
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  page-size-zero: true
+  params: count=countSql
+
+
+#--------七牛云配置
+qiniu:
+  access:
+    key: qgdx_EKFZNEWOCYSsVBd_nxODnesk9jZNxz8lzSQ
+  secret:
+    key: ZCBMyO8i5GSXFJcRadD2fdWvRmYWnZX-U55XxGWF
+  bucket:
+    name: demodeller
+    host:
+      name: rlwb98158.hn-bkt.clouddn.com
+  prefixName: /demodeller
+#--------七牛云配置
+img:  #//如果是Windows情况下，格式是 D:\\blog\\image\\   linx 格式"/home/blog/image/";
+  location: C:\\Users\\shiha\\Desktop\\images\\
+file:
+  serverurl:  http://localhost:8081
+  location:  S:\\neo4j-community-3.5.22\\import\\   #如果是Windows情况下，格式是 D:\\kgmanager\\csv\\   linx 格式"/home/kgmanager/csv/";
+

@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.demodeller.mapper.EntityElementsMapper">
+    <insert id="createOrder" useGeneratedKeys="true" keyProperty="id" parameterType="com.demodeller.entity.Order">
+        <selectKey keyProperty="id" resultType="String" order="BEFORE">
+            select replace(uuid(),'-','') from dual
+        </selectKey>
+        INSERT INTO orders (
+        id, name, value, des, contextId, nodeId
+        )
+        VALUES (
+        #{id, jdbcType=VARCHAR},#{name, jdbcType=VARCHAR},
+        #{value, jdbcType=VARCHAR},#{des, jdbcType=VARCHAR},
+        #{contextId, jdbcType=INTEGER},#{nodeId, jdbcType=INTEGER}
+        )
+    </insert>
+    <select id="getOrderList" resultType="map">
+		SELECT id, name, value, des, contextId, nodeId from orders where contextId=#{contextId} and nodeId=#{nodeId}
+	</select>
+    <update id="updateOrder" parameterType="com.demodeller.entity.Order">
+        UPDATE orders
+        <set>
+            <if test="name != null">
+                orders.name = #{name},
+            </if>
+            <if test="value != null">
+                orders.value=#{value},
+            </if>
+            <if test="des != null">
+                orders.des=#{des},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+    <delete id="deleteOrder" parameterType="String">
+        DELETE FROM orders
+        WHERE id = #{orderId}
+    </delete>
+
+    <insert id="createEvent" useGeneratedKeys="true" keyProperty="id" parameterType="com.demodeller.entity.Event">
+        <selectKey keyProperty="id" resultType="String" order="BEFORE">
+            select replace(uuid(),'-','') from dual
+        </selectKey>
+        INSERT INTO event(
+        id, name, type, message, contextId, nodeId, causeCommand, causeCommandId, dateTime
+        )
+        VALUES (
+        #{id, jdbcType=VARCHAR}, #{name, jdbcType=VARCHAR},
+        #{type, jdbcType=VARCHAR}, #{message, jdbcType=VARCHAR},
+        #{contextId, jdbcType=INTEGER}, #{nodeId, jdbcType=INTEGER},
+        #{causeCommand, jdbcType=VARCHAR}, #{causeCommandId, jdbcType=VARCHAR},
+        #{dateTime, jdbcType=TIMESTAMP},
+        )
+    </insert>
+    <select id="getEventList" resultType="map">
+		SELECT id, name, message, causeCommand, causeCommandId, dateTime from event where contextId=#{contextId} and nodeId=#{nodeId}
+	</select>
+    <update id="updateEvent" parameterType="com.demodeller.entity.Event">
+        UPDATE event
+        <set>
+            <if test="name != null">
+                event.name = #{name},
+            </if>
+            <if test="type != null">
+                event.type=#{type},
+            </if>
+            <if test="message != null">
+                event.message=#{message},
+            </if>
+            <if test="causeCommand != null">
+                event.causeCommand=#{causeCommand},
+            </if>
+            <if test="causeCommandId != null">
+                event.causeCommandId=#{causeCommandId},
+            </if>
+
+        </set>
+        WHERE id = #{id}
+    </update>
+    <delete id="deleteEvent" parameterType="String">
+        DELETE FROM event
+        WHERE id = #{eventId}
+    </delete>
+
+    <insert id="createParams" useGeneratedKeys="true" keyProperty="id" parameterType="com.demodeller.entity.Param">
+        <selectKey keyProperty="id" resultType="String" order="BEFORE">
+            select replace(uuid(),'-','') from dual
+        </selectKey>
+        INSERT INTO param(
+        id, name, type, des, actionId
+        )
+        VALUES (
+        #{id, jdbcType=VARCHAR},
+        #{name, jdbcType=VARCHAR},#{type, jdbcType=VARCHAR},#{des, jdbcType=VARCHAR},#{actionId, jdbcType=VARCHAR}
+        )
+    </insert>
+    <insert id="createRes" useGeneratedKeys="true" keyProperty="id" parameterType="com.demodeller.entity.Response">
+        <selectKey keyProperty="id" resultType="String" order="BEFORE">
+            select replace(uuid(),'-','') from dual
+        </selectKey>
+        INSERT INTO response(
+        id, code, actionId
+        )
+        VALUES (
+        #{id, jdbcType=VARCHAR}, #{code, jdbcType=VARCHAR}, #{actionId, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <select id="getParamListByActionId" resultType="map">
+		SELECT id, name, type, des, actionId from param where actionId=#{actionId}
+	</select>
+    <select id="getCodeListByActionId" resultType="string">
+		SELECT code from response where actionId=#{actionId}
+	</select>
+    <update id="updateParam" parameterType="com.demodeller.entity.Param">
+        UPDATE param
+        <set>
+            <if test="name != null">
+                param.name = #{name},
+            </if>
+            <if test="type != null">
+                param.type=#{type},
+            </if>
+            <if test="des != null">
+                param.des=#{des},
+            </if>
+        </set>
+        WHERE id = #{id} and actionId = #{actionId}
+    </update>
+    <delete id="deleteAllResByActionId" parameterType="String">
+        DELETE FROM response
+        WHERE actionId = #{actionId}
+    </delete>
+
+    <delete id="deleteAllParamsByActionId" parameterType="String">
+        DELETE FROM param
+        WHERE actionId = #{actionId}
+    </delete>
+
+    <insert id="saveStateFlow" useGeneratedKeys="true" keyProperty="id" parameterType="com.demodeller.entity.StateFlow">
+        <selectKey keyProperty="id" resultType="String" order="BEFORE">
+            select replace(uuid(),'-','') from dual
+        </selectKey>
+        INSERT INTO stateflow (
+        id, graphData, nodeId, contextId, mode
+        )
+        VALUES (
+        #{id, jdbcType=VARCHAR},#{graphData, jdbcType=VARCHAR},#{nodeId, jdbcType=INTEGER},#{contextId, jdbcType=INTEGER}, #{mode, jdbcType=VARCHAR}
+        )
+    </insert>
+    <delete id="deleteStateFlowByNodeIdAndDomainId">
+        DELETE FROM stateflow
+        WHERE nodeId = #{nodeId, jdbcType=INTEGER} and contextId = #{contextId, jdbcType=INTEGER} and mode = #{mode, jdbcType=VARCHAR}
+    </delete>
+    <select id="getStateFlow" resultType="String">
+		SELECT graphData from stateflow where nodeId = #{nodeId, jdbcType=INTEGER} and contextId = #{contextId, jdbcType=INTEGER} and mode = #{mode, jdbcType=VARCHAR}
+	</select>
+
+    <select id="getStateActionList" resultType="map">
+		SELECT id, name, des, stateName, mode, num, isStateContinue, causeEvent, causeMsg from stateaction where contextId=#{contextId} and nodeId=#{nodeId} and stateName=#{stateName} and mode=#{mode}
+	</select>
+    <insert id="addStateAction" useGeneratedKeys="true" keyProperty="id" parameterType="com.demodeller.entity.StateAction">
+        <selectKey keyProperty="id" resultType="String" order="BEFORE">
+            select replace(uuid(),'-','') from dual
+        </selectKey>
+        INSERT INTO stateaction (
+        id, name, contextId, nodeId, mode, stateName, des, num, isStateContinue, causeEvent, causeMsg
+        )
+        VALUES (
+        #{id, jdbcType=VARCHAR},#{name, jdbcType=VARCHAR},
+        #{contextId, jdbcType=INTEGER}, #{nodeId, jdbcType=INTEGER},
+        #{mode, jdbcType=VARCHAR}, #{stateName, jdbcType=VARCHAR},
+        #{des, jdbcType=VARCHAR}, #{num, jdbcType=INTEGER},
+        #{isStateContinue, jdbcType=BIT},
+        #{causeEvent, jdbcType=VARCHAR}, #{causeMsg, jdbcType=VARCHAR}
+        )
+    </insert>
+    <update id="updateStateAction" parameterType="com.demodeller.entity.StateAction">
+        UPDATE stateaction
+        <set>
+            <if test="num != null">
+                stateaction.num=#{num},
+            </if>
+            <if test="name != null">
+                stateaction.name=#{name},
+            </if>
+            <if test="des != null">
+                stateaction.des = #{des},
+            </if>
+            <if test="mode != null">
+                stateaction.mode=#{mode},
+            </if>
+            <if test="stateName != null">
+                stateaction.stateName=#{stateName},
+            </if>
+            <if test="isStateContinue != null">
+                stateaction.isStateContinue=#{isStateContinue},
+            </if>
+            <if test="causeEvent != null">
+                stateaction.causeEvent=#{causeEvent},
+            </if>
+            <if test="causeMsg != null">
+                stateaction.causeMsg=#{causeMsg},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+    <delete id="deleteStateAction" parameterType="String">
+        DELETE FROM stateaction
+        WHERE id = #{stateActionId, jdbcType=VARCHAR}
+    </delete>
+    <update id="updateStateActionName" parameterType="String">
+        UPDATE stateaction
+        <set>
+            stateaction.stateName=#{newName},
+        </set>
+        WHERE contextId=#{contextId} and nodeId=#{nodeId} and stateName=#{oldName}
+    </update>
+    <delete id="deleteParamByParamId" parameterType="String">
+        DELETE FROM param
+        WHERE id = #{paramId}
+    </delete>
+
+    <select id="getUserAttrList" resultType="map">
+		SELECT id, attrLabel, attrValue from userattrs where contextId=#{contextId} and nodeId=#{nodeId}
+	</select>
+    <select id="getUserAttr" resultType="String">
+		SELECT attrValue from userattrs where attrLabel=#{attrLabel}
+	</select>
+    <select id="isUserAttrExist" resultType="map">
+		SELECT id from userattrs where id=#{attrId}
+	</select>
+    <insert id="createUserAttr" parameterType="com.demodeller.entity.UserAttr">
+        INSERT INTO userattrs (
+        id, domainId, nodeId, attrLabel, attrValue
+        )
+        VALUES (
+        #{id, jdbcType=VARCHAR},
+        #{domainId, jdbcType=INTEGER}, #{nodeId, jdbcType=INTEGER},
+        #{attrLabel, jdbcType=VARCHAR}, #{attrValue, jdbcType=VARCHAR}
+        )
+    </insert>
+    <update id="updateUserAttr" parameterType="com.demodeller.entity.UserAttr">
+        UPDATE userattrs
+        <set>
+            <if test="attrLabel != null">
+                userattrs.attrLabel=#{attrLabel},
+            </if>
+            <if test="attrValue != null">
+                userattrs.attrValue=#{attrValue},
+            </if>
+        </set>
+        WHERE domainId=#{domainId} and nodeId=#{nodeId} and id=#{id}
+    </update>
+    <delete id="deleteUserAttrById" parameterType="String">
+        DELETE FROM userattrs
+        WHERE id = #{attrId}
+    </delete>
+
+    <insert id="saveNodeImage" parameterType="java.util.List">
+        insert knowledgenodedetailfile
+        (contextId,nodeId,fileName,imageType,createUser,createTime,status)
+        values
+        <foreach collection="maplist" item="item" separator=",">
+            (#{item.contextId},#{item.nodeId} ,#{item.file}
+            ,#{item.imageType},#{item.createUser},#{item.createTime},#{item.status})
+        </foreach>
+    </insert>
+    <select id="getNodeImageList" resultType="map">
+		SELECT * from knowledgenodedetailfile where Status=1 and  contextId=#{contextId} and nodeId=#{nodeId}
+	</select>
+    <update id="deleteNodeImage">
+		update knowledgenodedetailfile set Status=0 where contextId=#{contextId} and nodeId=#{nodeId}
+	</update>
+
+    <insert id="saveNodeContent" parameterType="map">
+		insert richcontent
+		(contextId,nodeId,content,createUser,createTime,status)
+		values
+		(#{params.contextId},#{params.nodeId} ,#{params.content} ,#{params.createUser},#{params.createTime},#{params.status})
+	</insert>
+    <update id="updateNodeContent" parameterType="map">
+        UPDATE richcontent SET content =#{params.content} ,modifyTime=#{params.modifyTime} WHERE contextId=#{params.contextId} and nodeId = #{params.nodeId}
+    </update>
+    <select id="getNodeContent" resultType="map">
+		SELECT * from richcontent where status=1 and  contextId=#{contextId} and nodeId=#{nodeId}
+	</select>
+
+</mapper>

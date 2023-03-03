@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.demodeller.mapper.BoundedContextMapper">
+    <select id="loadContext" resultType="map">
+        SELECT * FROM boundedcontext
+        <where>
+            status=1 and domainId=#{domainId}
+            <if test="contextName!='' and contextName!=null">
+                and name like '%${contextName}%'
+            </if>
+        </where>
+        order by id desc
+    </select>
+    <select id="getContexts" resultType="map">
+		SELECT * FROM boundedcontext where status=1 and domainId=#{domainId}
+	</select>
+    <select id="getContextByName" resultType="map" parameterType="String">
+		SELECT * FROM boundedcontext WHERE status=1 and name =#{contextName}
+	</select>
+    <select id="getContextById" resultType="map" parameterType="Integer">
+		SELECT * FROM boundedcontext WHERE status=1 and id =#{contextId}
+	</select>
+    <insert id="createContext" parameterType="map">
+        INSERT INTO boundedcontext(name, createuser,nodecount, shipcount,status, domainId)
+        VALUES (#{params.name},#{params.createuser},#{params.nodecount},#{params.shipcount},1, #{params.domainId})
+    </insert>
+    <update id="updateContext" parameterType="com.demodeller.entity.BoundedContext">
+        UPDATE boundedcontext
+        <set>
+            <if test="name != null">
+                boundedcontext.name = #{name},
+            </if>
+            <if test="type != null">
+                boundedcontext.type=#{type},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+    <update id="deleteContext" parameterType="Integer">
+        UPDATE boundedcontext SET status = 0 WHERE id = #{contextId}
+    </update>
+
+    <insert id="createWordClass" useGeneratedKeys="true" keyProperty="id" parameterType="com.demodeller.entity.WordClass">
+        <selectKey keyProperty="id" resultType="String" order="BEFORE">
+            select replace(uuid(),'-','') from dual
+        </selectKey>
+        INSERT INTO wordclass(
+        id, name, subClassOf, type, des, contextId
+        )
+        VALUES (
+        #{id, jdbcType=VARCHAR},#{name, jdbcType=VARCHAR},
+        #{subClassOf, jdbcType=VARCHAR},#{type, jdbcType=VARCHAR},
+        #{des, jdbcType=VARCHAR},#{contextId, jdbcType=INTEGER}
+        )
+    </insert>
+    <select id="getWordClassList" resultType="map">
+		SELECT id, name, subClassOf,type, des from wordclass where contextId=#{contextId}
+	</select>
+    <delete id="deleteWordClass" parameterType="String">
+        DELETE FROM wordclass
+        WHERE id = #{wordId}
+    </delete>
+    <delete id="deleteWordClassByContextId" parameterType="Integer">
+        DELETE FROM wordclass
+        WHERE contextId=#{contextId}
+    </delete>
+    <update id="updateWordClass" parameterType="com.demodeller.entity.WordClass">
+        UPDATE wordclass
+        <set>
+            <if test="name != null">
+                wordclass.name = #{name},
+            </if>
+            <if test="subClassOf != null">
+                wordclass.subClassOf=#{subClassOf},
+            </if>
+            <if test="type != null">
+                wordclass.type=#{type},
+            </if>
+            <if test="des != null">
+                wordclass.des=#{des},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <insert id="createWordClassAttr" useGeneratedKeys="true" keyProperty="id" parameterType="com.demodeller.entity.WordClassAttr">
+        <selectKey keyProperty="id" resultType="String" order="BEFORE">
+            select replace(uuid(),'-','') from dual
+        </selectKey>
+        INSERT INTO wordclassattr(
+        id, name, type, def, contextId,classId
+        )
+        VALUES (
+        #{id, jdbcType=VARCHAR},#{name, jdbcType=VARCHAR},#{type, jdbcType=VARCHAR},
+        #{def, jdbcType=VARCHAR},#{contextId, jdbcType=INTEGER},#{classId, jdbcType=VARCHAR}
+        )
+    </insert>
+    <select id="getWordClassAttrList" resultType="map">
+		SELECT id, name, type, def from wordclassattr where contextId=#{contextId} and classId=#{classId}
+	</select>
+    <delete id="deleteWordClassAttr" parameterType="String">
+        DELETE FROM wordclassattr
+        WHERE id = #{classAttrId}
+    </delete>
+    <update id="updateWordClassAttr" parameterType="com.demodeller.entity.WordClassAttr">
+        UPDATE wordclassattr
+        <set>
+            <if test="name != null">
+                wordclassattr.name = #{name},
+            </if>
+            <if test="type != null">
+                wordclassattr.type=#{type},
+            </if>
+            <if test="def != null">
+                wordclassattr.def=#{def},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <insert id="createWordRel" useGeneratedKeys="true" keyProperty="id" parameterType="com.demodeller.entity.WordRel">
+        <selectKey keyProperty="id" resultType="String" order="BEFORE">
+            select replace(uuid(),'-','') from dual
+        </selectKey>
+        INSERT INTO wordrel(
+        id, name, subRelOf, ranges, domains, contextId
+        )
+        VALUES (
+        #{id, jdbcType=VARCHAR},#{name, jdbcType=VARCHAR},
+        #{subRelOf, jdbcType=VARCHAR},#{domains, jdbcType=VARCHAR},
+        #{ranges, jdbcType=VARCHAR},#{contextId, jdbcType=INTEGER}
+        )
+    </insert>
+    <select id="getWordRelList" resultType="map">
+		SELECT id, name, subRelOf, domains, ranges from wordrel where contextId=#{contextId}
+	</select>
+    <delete id="deleteWordRel" parameterType="String">
+        DELETE FROM wordrel
+        WHERE id = #{relId}
+    </delete>
+    <delete id="deleteWordRelByContextId" parameterType="Integer">
+        DELETE FROM wordrel
+        WHERE contextId=#{contextId}
+    </delete>
+    <update id="updateWordRel" parameterType="com.demodeller.entity.WordRel">
+        UPDATE wordrel
+        <set>
+            <if test="name != null">
+                wordrel.name = #{name},
+            </if>
+            <if test="subRelOf != null">
+                wordrel.subRelOf=#{subRelOf},
+            </if>
+            <if test="ranges != null">
+                wordrel.ranges=#{ranges},
+            </if>
+            <if test="domains != null">
+                wordrel.domains=#{domains},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <select id="getAllMsgOfContext" resultType="map">
+		SELECT id, name, type, triggerAction, causeContext, causeContextId, causeEvent from msg_transmit where contextId=#{contextId} and domainId=#{domainId}
+	</select>
+    <select id="getAllMsgOfDomain" resultType="map">
+		SELECT id, name, type, triggerAction, causeContext, causeContextId, causeEvent, contextId from msg_transmit where domainId=#{domainId}
+	</select>
+    <insert id="createMsg" useGeneratedKeys="true" keyProperty="id" parameterType="com.demodeller.entity.Msg">
+        <selectKey keyProperty="id" resultType="String" order="BEFORE">
+            select replace(uuid(),'-','') from dual
+        </selectKey>
+        INSERT INTO msg_transmit(
+        id, name, type, triggerAction, causeContext, causeContextId, causeEvent, contextId, domainId
+        )
+        VALUES (
+        #{id, jdbcType=VARCHAR},#{name, jdbcType=VARCHAR},
+        #{type, jdbcType=VARCHAR},#{triggerAction, jdbcType=VARCHAR},
+        #{causeContext, jdbcType=VARCHAR}, #{causeContextId, jdbcType=INTEGER},
+        #{causeEvent, jdbcType=VARCHAR},
+        #{contextId, jdbcType=INTEGER}, #{domainId, jdbcType=INTEGER}
+        )
+    </insert>
+    <delete id="deleteMsg" parameterType="String">
+        DELETE FROM msg_transmit
+        WHERE id = #{msgId}
+    </delete>
+    <delete id="deleteMsgByContextId" parameterType="Integer">
+        DELETE FROM msg_transmit
+        WHERE contextId=#{contextId}
+    </delete>
+    <update id="updateMsg" parameterType="com.demodeller.entity.Msg">
+        UPDATE msg_transmit
+        <set>
+            <if test="name != null">
+                msg_transmit.name = #{name},
+            </if>
+            <if test="type != null">
+                msg_transmit.type=#{type},
+            </if>
+            <if test="triggerAction != null">
+                msg_transmit.triggerAction=#{triggerAction},
+            </if>
+            <if test="causeContext != null">
+                msg_transmit.causeContext=#{causeContext},
+            </if>
+            <if test="causeContextId != null">
+                msg_transmit.causeContextId=#{causeContextId},
+            </if>
+            <if test="causeEvent != null">
+                msg_transmit.causeEvent=#{causeEvent},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <select id="getAllTriggerActionByContextId" resultType="map">
+		SELECT * from stateaction where contextId=#{contextId}
+	</select>
+
+    <select id="getAllCauseEventByContextId" resultType="map">
+		SELECT * from event where contextId=#{contextId}
+	</select>
+
+    <insert id="createUncertainty" useGeneratedKeys="true" keyProperty="id" parameterType="com.demodeller.entity.Uncertainty">
+        <selectKey keyProperty="id" resultType="String" order="BEFORE">
+            select replace(uuid(),'-','') from dual
+        </selectKey>
+        INSERT INTO uncertainty(
+        id, name, type, des, associatedModels, contextId, domainId
+        )
+        VALUES (
+        #{id, jdbcType=VARCHAR},#{name, jdbcType=VARCHAR},
+        #{type, jdbcType=VARCHAR},#{des, jdbcType=VARCHAR},
+        #{associatedModels, jdbcType=VARCHAR},
+        #{contextId, jdbcType=INTEGER}, #{domainId, jdbcType=INTEGER}
+        )
+    </insert>
+    <delete id="deleteUncertainty" parameterType="String">
+        DELETE FROM uncertainty
+        WHERE id = #{uncertaintyId}
+    </delete>
+    <update id="updateUncertainty" parameterType="com.demodeller.entity.Uncertainty">
+        UPDATE uncertainty
+        <set>
+            <if test="name != null">
+                uncertainty.name = #{name},
+            </if>
+            <if test="type != null">
+                uncertainty.type=#{type},
+            </if>
+            <if test="des != null">
+                uncertainty.des=#{des},
+            </if>
+            <if test="associatedModels != null">
+                uncertainty.associatedModels=#{associatedModels},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+    <select id="getAllUncertainty" resultType="map">
+		SELECT id, name, type, des, associatedModels
+		from uncertainty
+		where contextId=#{contextId} and domainId=#{domainId}
+	</select>
+
+</mapper>
